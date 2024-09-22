@@ -14,8 +14,13 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
-  'Color': [255, 0, 0],
+  'UpperFireColor': [255, 230, 77],
+  'LowerFireColor': [255, 126, 51],
+  'EnableBackground': true,
+  'FireIntensity': 2,
+  'Reset': resetFireball
 };
+
 
 let icosphere: Icosphere;
 let square: Square;
@@ -31,6 +36,13 @@ function loadScene() {
   cube.create();
 }
 
+function resetFireball() {
+    controls.EnableBackground = true;
+    controls.FireIntensity = 2;
+    controls.UpperFireColor = [255, 230, 77];
+    controls.LowerFireColor = [255, 126, 51];
+}
+
 function main() {
   // Initial display for framerate
   const stats = Stats();
@@ -44,7 +56,11 @@ function main() {
   const gui = new DAT.GUI();
   gui.add(controls, 'tesselations', 0, 8).step(1);
   gui.add(controls, 'Load Scene');
-  gui.addColor(controls, 'Color');
+  gui.addColor(controls, 'UpperFireColor');
+  gui.addColor(controls, 'LowerFireColor');
+  gui.add(controls, 'EnableBackground');
+  gui.add(controls, 'FireIntensity', 1, 3).step(0.5);
+  gui.add(controls, 'Reset');
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -62,7 +78,7 @@ function main() {
   const camera = new Camera(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0));
 
   const renderer = new OpenGLRenderer(canvas);
-  renderer.setClearColor(0.2, 0.2, 0.2, 1);
+  renderer.setClearColor(0, 0, 0, 1);
   gl.enable(gl.DEPTH_TEST);
 
   const shader = new ShaderProgram([
@@ -79,6 +95,7 @@ function main() {
 
   // This function will be called every frame
   function tick() {
+    gui.updateDisplay();
     camera.update();
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
@@ -90,20 +107,25 @@ function main() {
       icosphere.create();
     }
 
-    const normalizedColor = vec4.fromValues(controls.Color[0] / 255, controls.Color[1] / 255, controls.Color[2] / 255, 1);
-    shader.setGeometryColor(normalizedColor);
+    const normalizedColorUpper = vec4.fromValues(controls.UpperFireColor[0] / 255, controls.UpperFireColor[1] / 255, controls.UpperFireColor[2] / 255, 1);
+    shader.setUpperColor(normalizedColorUpper);
+    const normalizedColorLower = vec4.fromValues(controls.LowerFireColor[0] / 255, controls.LowerFireColor[1] / 255, controls.LowerFireColor[2] / 255, 1);
+    shader.setLowerColor(normalizedColorLower);
 
     time++;
     shader.setTime(time);
     shader.setCameraPos(vec4.fromValues(camera.controls.eye[0], camera.controls.eye[1], camera.controls.eye[2], 0));
+    shader.setFireIntensity(controls.FireIntensity);
 
-    backGroundShader.setTime(time);
+    if (controls.EnableBackground) {
+        backGroundShader.setTime(time);
 
-    gl.depthMask(false);
-    renderer.render(camera, backGroundShader, [
-        square,
-    ]);
-    gl.depthMask(true);
+        gl.depthMask(false);
+        renderer.render(camera, backGroundShader, [
+            square,
+        ]);
+        gl.depthMask(true);
+    }
 
     renderer.render(camera, shader, [
       icosphere,

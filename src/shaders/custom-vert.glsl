@@ -21,6 +21,7 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
                             // but in HW3 you'll have to generate one yourself
 uniform float u_Time;
 uniform vec4 u_CameraPos;
+uniform float u_Intensity;
 
 in vec4 vs_Pos;             // The array of vertex positions passed to the shader
 
@@ -81,14 +82,14 @@ void main()
     float radius = 0.4f;
     float t = 0.003f * u_Time;
 
-    float height = mix(2.f, 4.f, bias((sin(t * 2.f) + 1.f) * 0.5f, 0.8f));
+    float height = mix(u_Intensity, 2.f * u_Intensity, bias((sin(t * 2.f) + 1.f) * 0.5f, 0.8f));
     radius += height * triangleWave(pos.x - 1.f, 1.f, 2.0) - 0.1f;
 
     radius += 0.2f * (sin(25.0f * (pos.x - t)) + 1.0f) * 0.5f;
     radius += 0.4f * (sin(15.0f * (pos.y - t * 0.7f)) + 1.0f) * 0.5f;
     radius += 0.05f * (cos(30.0f * (pos.z + t)) + 1.0f) * 0.5f;
 
-    float lowerLimit = mix(0.4f, 0.65f, bias((sin(t * 2.f) + 1.f) * 0.5f, 0.8f));
+    float lowerLimit = mix(0.2f * u_Intensity, 0.325f * u_Intensity, bias((sin(t * 2.f) + 1.f) * 0.5f, 0.8f));
     float lowerRadius = mix(lowerLimit, 1.f, pos.y + 1.f);
     lowerRadius = mix(lowerLimit + 0.3f, lowerRadius, abs(pos.x));
     lowerRadius += 0.04f * (sin(12.f * (pos.x - t)) + 1.f) * 0.5f;

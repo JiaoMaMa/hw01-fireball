@@ -12,7 +12,8 @@
 // position, light position, and vertex color.
 precision highp float;
 
-uniform vec4 u_Color; // The color with which to render this instance of geometry.
+uniform vec4 u_UpperColor;
+uniform vec4 u_LowerColor;
 uniform float u_Time; 
 uniform vec4 u_CameraPos;
 
@@ -133,7 +134,7 @@ void main()
 
 
     // Base color gradient for fire
-    vec3 fireColor = mix(vec3(1.f, 0.5f, 0.2f), vec3(1.f, 0.9f, 0.3f), fs_Pos.y - 0.1f);
+    vec3 fireColor = mix(u_LowerColor.xyz, u_UpperColor.xyz, fs_Pos.y - 0.1f);
 
     // Add some spots on the fire ball
     vec3 p = vec3(fs_Pos.xyz) * 2.f - 25.f * (sin(u_Time * 0.0003f) + 1.f);
