@@ -148,5 +148,7 @@ void main()
     vec3 rimLight = calculateRimLighting(normalize(fs_Nor.xyz), viewVec.xyz);
     vec3 color = fireColor * toonColor + rimLight;
 
-    out_Col = vec4(color, 1.f);
+    float alpha = mix(1.f, 0.5f, fs_Pos.y - 0.56f);
+
+    out_Col = vec4(color, alpha);
 }
