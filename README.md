@@ -2,6 +2,8 @@
 
 ## Christine Kneer
 
+Live Demo link: https://jiaomama.github.io/hw01-fireball/
+
 For this assignment, I created a procedural fireball inspired by Sawada Tsunayoshi’s Dying Will flame ability from the anime *Katekyo Hitman Reborn!* series. 
 
 <p align="center">
